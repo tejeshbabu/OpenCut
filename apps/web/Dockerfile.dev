@@ -1,0 +1,54 @@
+FROM oven/bun:alpine AS base
+
+# Install dependencies for development
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files for all workspaces
+COPY package.json package.json
+COPY bun.lock bun.lock
+COPY turbo.json turbo.json
+
+COPY apps/web/package.json apps/web/package.json
+COPY packages/db/package.json packages/db/package.json
+COPY packages/auth/package.json packages/auth/package.json
+
+# Install all dependencies
+RUN bun install
+
+# Development stage
+FROM base AS dev
+WORKDIR /app
+
+# Copy all source code
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Set development environment
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Expose ports for development
+EXPOSE 9000
+# EXPOSE 9229
+
+# Set environment variables for development
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# # Create a non-root user for development
+# RUN addgroup --system --gid 1001 nodejs
+# RUN adduser --system --uid 1001 nextjs
+
+# # Change ownership of the app directory
+# RUN chown -R nextjs:nodejs /app
+
+# # Switch to non-root user
+# USER nextjs
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Start development server with hot reloading
+CMD ["bun", "run", "dev"] 

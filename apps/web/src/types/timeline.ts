@@ -7,6 +7,7 @@ export interface TimelineClipProps {
   track: TimelineTrack;
   zoomLevel: number;
   isSelected: boolean;
+  onContextMenu?: (e: React.MouseEvent, clip: string|number) => void;
   onClipMouseDown: (e: React.MouseEvent, clip: TimelineClip) => void;
   onClipClick: (e: React.MouseEvent, clip: TimelineClip) => void;
 }

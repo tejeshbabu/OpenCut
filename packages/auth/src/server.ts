@@ -23,7 +23,7 @@ export const auth = betterAuth({
     },
   },
   appName: "OpenCut",
-  trustedOrigins: ["http://localhost:3000"],
+  trustedOrigins: ["http://localhost:9000"],
 });
 
 export type Auth = typeof auth;
